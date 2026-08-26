@@ -17,7 +17,7 @@ export const projects: Project[] = [
     title: "Playwright Automation Framework",
     tagline: "A scalable end-to-end automation framework built on modern QA practices.",
     technologies: ["Playwright", "TypeScript", "Page Object Model", "Fixtures", "GitHub Actions"],
-    github: "https://github.com/your-user/playwright-automation-framework",
+    github: "https://github.com/achanto98/playwright-automation-framework",
     problem:
       "Manual regression testing across web flows was slow to execute and inconsistent between runs. The team needed an automation layer that could run reliably in CI, scale to new features without rewriting existing tests, and give clear, actionable failure reports.",
     architecture:
@@ -40,7 +40,7 @@ export const projects: Project[] = [
     title: "API Testing Framework",
     tagline: "A structured, reusable Postman/Newman suite with schema validation and environment-driven config.",
     technologies: ["Postman", "Newman", "JSON Schema", "Environment Variables"],
-    github: "https://github.com/your-user/api-testing-framework",
+    github: "https://github.com/achanto98/api-testing-framework",
     problem:
       "API contracts were only validated manually, which meant breaking changes reached QA late in the cycle. The goal was a suite that could run in CI, validate both status codes and response shape, and be reused across environments without duplicating collections.",
     architecture:
@@ -63,7 +63,7 @@ export const projects: Project[] = [
     title: "Performance Testing with JMeter",
     tagline: "Load and stress testing pipeline with data-driven scenarios and automated HTML dashboards.",
     technologies: ["JMeter", "Thread Groups", "CSV Data Set Config", "JSON Extractor"],
-    github: "https://github.com/your-user/performance-testing-jmeter",
+    github: "https://github.com/achanto98/performance-testing-jmeter",
     problem:
       "The team had no visibility into how key endpoints behaved under realistic concurrent load, which meant performance regressions were only discovered in production. The objective was a repeatable load test that modeled real usage and produced a report stakeholders could actually read.",
     architecture:
@@ -86,7 +86,7 @@ export const projects: Project[] = [
     title: "CI/CD Pipeline with GitHub Actions",
     tagline: "Automated test execution, reporting, and validation wired directly into the delivery pipeline.",
     technologies: ["GitHub Actions", "YAML Workflows", "Artifacts", "Status Checks"],
-    github: "https://github.com/your-user/cicd-github-actions",
+    github: "https://github.com/achanto98/cicd-github-actions",
     problem:
       "Automated tests existed but were run manually and inconsistently before merges, so they didn't actually prevent regressions from reaching main. The pipeline needed to run tests automatically, surface results clearly, and gate merges on quality.",
     architecture:
@@ -109,7 +109,7 @@ export const projects: Project[] = [
     title: "Quality Engineering Case Study: Hotel Booking Platform",
     tagline: "End-to-end test strategy for a hotel booking system, from risk analysis to release checklist.",
     technologies: ["Risk-Based Testing", "Test Strategy", "Release Validation"],
-    github: "https://github.com/your-user/qe-case-study-hotel-booking",
+    github: "https://github.com/achanto98/qe-case-study-hotel-booking",
     problem:
       "This case study answers a common senior QA interview question: how would you approach quality for a system like a hotel booking platform (search, availability, pricing, booking, payment, cancellation) with no prior context on the codebase, and a release next sprint?",
     architecture:

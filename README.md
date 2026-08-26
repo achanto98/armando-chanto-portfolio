@@ -44,18 +44,24 @@ public/
 
 ## Next steps to fill in (placeholders to replace)
 
-- **`your-user`**: replace with your real GitHub/LinkedIn usernames in `src/data/projects.ts`,
-  `src/components/Footer.tsx`, `src/app/page.tsx`, and `src/app/contact/page.tsx`.
-- **`public/resume.pdf`**: drop your actual resume PDF here.
+- ~~**`your-user`**: replace with your real GitHub/LinkedIn usernames~~ — done: GitHub
+  (`github.com/achanto98`) and LinkedIn (`linkedin.com/in/armando-chanto-cr2904`) are wired up in
+  `src/data/projects.ts`, `src/components/Footer.tsx`, `src/app/page.tsx`, and
+  `src/app/contact/page.tsx`.
+- ~~**`public/resume.pdf`**~~ — done, resume PDF is in place.
 - **`src/data/projects.ts`**: each project already has real, roadmap-based copy for Problem /
   Architecture / Implementation / Results / Lessons Learned — adjust once each framework/repo
-  exists, and swap in real GitHub links.
+  exists on `github.com/achanto98` (the links currently assume repo names that match the project
+  slugs; create those repos or update the links to match).
 - **Screenshots & diagrams**: add images to `public/images/` and reference them on the project
   detail page (`src/app/projects/[slug]/page.tsx`) as you build out each repository (framework
   folder structure, Playwright HTML reports, JMeter dashboards, Postman collections, GitHub
   Actions runs, architecture diagrams).
-- **Domain**: once deployed, point `armandochanto.dev` at Vercel (or GitHub Pages) and update the
-  `metadataBase` URL in `src/app/layout.tsx`.
+- **Favicon & OG image**: no `favicon.ico`/`app/icon.png` or Open Graph share image exists yet —
+  add them so browser tabs and social link previews aren't blank.
+- **Domain**: once deployed, point `armandochanto.dev` at Vercel (or GitHub Pages) and confirm the
+  `metadataBase` URL in `src/app/layout.tsx` and the URLs in `src/app/sitemap.ts` /
+  `src/app/robots.ts` match.
 
 ## Deployment
 

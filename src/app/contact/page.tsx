@@ -14,13 +14,13 @@ const channels = [
   },
   {
     label: "LinkedIn",
-    value: "linkedin.com/in/your-user",
-    href: "https://linkedin.com/in/your-user",
+    value: "linkedin.com/in/armando-chanto-cr2904",
+    href: "https://www.linkedin.com/in/armando-chanto-cr2904/",
   },
   {
     label: "GitHub",
-    value: "github.com/your-user",
-    href: "https://github.com/your-user",
+    value: "github.com/achanto98",
+    href: "https://github.com/achanto98",
   },
 ];
 

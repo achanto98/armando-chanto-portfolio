@@ -45,7 +45,7 @@ export default function HomePage() {
               Projects
             </Link>
             <a
-              href="https://github.com/your-user"
+              href="https://github.com/achanto98"
               target="_blank"
               rel="noreferrer"
               className="rounded-lg border border-ink-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-accent hover:text-accent"
@@ -53,7 +53,7 @@ export default function HomePage() {
               GitHub
             </a>
             <a
-              href="https://linkedin.com/in/your-user"
+              href="https://www.linkedin.com/in/armando-chanto-cr2904/"
               target="_blank"
               rel="noreferrer"
               className="rounded-lg border border-ink-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-accent hover:text-accent"
