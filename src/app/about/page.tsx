@@ -25,7 +25,7 @@ const focusAreas = [
   {
     title: "Quality Leadership",
     description:
-      "Leading QA strategy end-to-end: risk analysis, release checklists, and mentoring a team on where to invest testing effort.",
+      "Leadership experience owning QA strategy end-to-end: risk analysis, release checklists, and mentoring a team on where to invest testing effort.",
   },
 ];
 
@@ -36,17 +36,17 @@ export default function AboutPage() {
 
       <div className="max-w-3xl space-y-6 text-base leading-relaxed text-slate-300">
         <p>
-          I&apos;m Armando Chanto, a QA Lead with 3+ years of experience in software quality
-          engineering. My work spans manual and automated testing, but the throughline is the
-          same: understanding where a system is most likely to break, and building the fastest
-          reliable way to catch it.
+          I&apos;m Armando Chanto, a QA Engineer with 3+ years of experience in software quality
+          engineering, including leadership experience. My work spans manual and automated
+          testing, but the throughline is the same: understanding where a system is most likely
+          to break, and building the fastest reliable way to catch it.
         </p>
         <p>
-          As a QA Lead, I&apos;ve owned test strategy end-to-end — from risk analysis and test
-          planning, to building automation frameworks for UI, API, and performance testing, to
-          defining the release checklists a team actually follows under deadline pressure. I care
-          as much about how a framework is organized and why it scales as I do about which tool
-          sits on top of it.
+          With leadership experience, I&apos;ve owned test strategy end-to-end — from risk
+          analysis and test planning, to building automation frameworks for UI, API, and
+          performance testing, to defining the release checklists a team actually follows under
+          deadline pressure. I care as much about how a framework is organized and why it scales
+          as I do about which tool sits on top of it.
         </p>
         <p>
           I approach quality as a continuous practice: instrumenting pipelines so failures surface

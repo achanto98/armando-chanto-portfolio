@@ -56,14 +56,20 @@ export default async function ProjectDetailPage({
         ))}
       </div>
 
-      <a
-        href={project.github}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-6 inline-flex items-center rounded-lg border border-ink-600 px-4 py-2 text-sm font-semibold text-white hover:border-accent hover:text-accent"
-      >
-        View on GitHub →
-      </a>
+      {project.github ? (
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-6 inline-flex items-center rounded-lg border border-ink-600 px-4 py-2 text-sm font-semibold text-white hover:border-accent hover:text-accent"
+        >
+          View on GitHub →
+        </a>
+      ) : project.repoNote ? (
+        <p className="mt-6 max-w-2xl rounded-lg border border-ink-700/60 bg-ink-900/40 px-4 py-3 text-sm text-slate-400">
+          {project.repoNote}
+        </p>
+      ) : null}
 
       <div className="mt-14 space-y-12">
         {stages.map((stage) => (
@@ -96,6 +102,27 @@ export default async function ProjectDetailPage({
             ))}
           </ul>
         </section>
+
+        {project.codeHighlights && project.codeHighlights.length > 0 && (
+          <section>
+            <h2 className="font-mono text-sm uppercase tracking-widest text-accent">
+              Code Highlights
+            </h2>
+            <div className="mt-3 max-w-3xl space-y-8">
+              {project.codeHighlights.map((highlight) => (
+                <div key={highlight.title}>
+                  <h3 className="text-base font-semibold text-white">{highlight.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                    {highlight.description}
+                  </p>
+                  <pre className="mt-3 overflow-x-auto rounded-lg border border-ink-700/60 bg-ink-900/60 p-4 text-xs leading-relaxed text-slate-300">
+                    <code>{highlight.code}</code>
+                  </pre>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </Container>
   );

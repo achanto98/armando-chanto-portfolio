@@ -30,7 +30,7 @@ export default function ContactPage() {
       <SectionHeading
         eyebrow="Get in touch"
         title="Contact"
-        description="Open to QA Lead / Software Quality Engineer roles. The fastest way to reach me is email."
+        description="Open to QA Engineer / Software Engineer roles. The fastest way to reach me is email."
       />
 
       <div className="grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">

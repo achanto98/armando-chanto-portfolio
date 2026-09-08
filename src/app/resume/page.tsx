@@ -13,8 +13,8 @@ export default function ResumePage() {
 
       <div className="max-w-2xl rounded-xl border border-ink-700/60 bg-ink-900/60 p-8">
         <p className="text-base leading-relaxed text-slate-300">
-          Get the full breakdown of my experience as a QA Lead: automation frameworks, API and
-          performance testing, and quality leadership.
+          Get the full breakdown of my experience as a QA Engineer with leadership experience:
+          automation frameworks, API and performance testing, and quality leadership.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-4">

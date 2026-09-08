@@ -3,36 +3,90 @@ export type Project = {
   title: string;
   tagline: string;
   technologies: string[];
-  github: string;
+  github?: string;
+  repoNote?: string;
   problem: string;
   architecture: string;
   implementation: string;
   results: string[];
   lessons: string[];
+  codeHighlights?: { title: string; description: string; code: string }[];
 };
 
 export const projects: Project[] = [
   {
     slug: "playwright-automation-framework",
-    title: "Playwright Automation Framework",
-    tagline: "A scalable end-to-end automation framework built on modern QA practices.",
-    technologies: ["Playwright", "TypeScript", "Page Object Model", "Fixtures", "GitHub Actions"],
-    github: "https://github.com/achanto98/playwright-automation-framework",
+    title: "Multi-Tenant E2E Automation Framework for a Banking Travel Platform",
+    tagline:
+      "A single parameterized Playwright suite that validates the same travel booking app across three bank-branded clients — with backend and error oracles the UI alone can't provide.",
+    technologies: [
+      "Playwright",
+      "JavaScript",
+      "Custom Fixtures",
+      "Custom Reporter API",
+      "GitHub Actions",
+    ],
+    repoNote:
+      "Built as part of a production QA engagement for a banking client. The codebase is private and proprietary, so it can't be linked here — the summary and snippets below describe the real architecture and patterns, written up from memory without any client-identifying code or data.",
     problem:
-      "Manual regression testing across web flows was slow to execute and inconsistent between runs. The team needed an automation layer that could run reliably in CI, scale to new features without rewriting existing tests, and give clear, actionable failure reports.",
+      "The application under test was a travel booking product (flights, hotels, cars, account) white-labeled for three different bank clients, each with its own domain, auth flow, and environment matrix (QA, staging, demo, pre-prod, production). The naive approach — one test folder per bank — would have tripled the maintenance cost of every UI change, since all three brands share the same underlying app and only auth and URL resolution actually differ.",
     architecture:
-      "The framework follows a layered Page Object Model: page objects encapsulate locators and actions, fixtures inject authenticated sessions and test data, and a thin API layer seeds state directly instead of clicking through the UI when it isn't the behavior under test. Configuration is split by environment (local, staging, CI) so the same suite runs anywhere with a single env variable.",
+      "The suite runs as one codebase parameterized at runtime by PLATFORM (which bank) and TEST_ENV (which environment), resolved centrally in a single URL/config module so specs never branch on tenant themselves. Authentication runs once per suite via a Playwright project dependency: a setup project logs in, waits for the auth token to actually land in storage (not just for the URL to change), and persists cookies + localStorage to a storage-state file that every other project inherits — turning 50+ tests worth of login into a single, fast, diagnosable step instead of 50 chances to flake. Tests are tagged by suite, module, and aspect (e.g. smoke + flights, regression + payments) so CI can select exactly the right slice: full smoke on every PR, a payments-excluding grep before touching staging, module-only reruns when a single area changes.",
     implementation:
-      "Tests are organized by feature domain rather than by page, so a single spec reflects a real user journey. Custom Playwright fixtures handle login, test data cleanup, and tracing. A GitHub Actions workflow runs the suite in parallel shards on every pull request, uploads the HTML report and trace files as artifacts, and blocks merges on failure.",
+      "Two disciplines carry the framework. First, waits are event-based end to end: a small wrapper makes raw sleeps a no-op in CI and legal only for a human watching headed mode, and the default pattern for any action that hits the backend is a click and the matching network response awaited together (Promise.all), so the test never has to guess whether a checkout step actually failed on the server. Second, helpers are strictly separated from assertions — helper functions perform actions and UI logic and return plain data, while the spec file owns every expect() and therefore every business-readable failure message; the same search helper backs both a 'results found' test and a 'zero results' edge case instead of only the happy path. On top of that sits a layer of oracles beyond the UI: a network-guard fixture classifies every XHR/fetch against a map of critical endpoints and hard-fails the test if a watched endpoint returns an error or is never called — even if every visible assertion passed — and attaches a root-cause diagnostic to the HTML report; a mutation-observer-based error-guard catches transient error dialogs that a point-in-time assertion would simply miss; and an env-guard fails closed, blocking destructive or payment flows from ever running outside the designated safe environment by default.",
     results: [
-      "Reduced full regression run time from a multi-hour manual pass to a parallelized CI run.",
-      "Flake rate kept low through explicit waits tied to network/state, not timeouts.",
-      "New feature coverage added in hours instead of days thanks to reusable page objects and fixtures.",
+      "Cut auth-related flakiness to near zero by moving 50+ tests from per-test login to a single, verified, shared session.",
+      "Caught backend regressions that were fully invisible in the UI — the network-guard hard-gate turned silent 5xx/4xx responses into failing tests with an attached root-cause diagnostic instead of a false-green report.",
+      "Made the suite selectively runnable (smoke vs. regression, per-module, payments-excluded) via a tag taxonomy, so CI feedback stayed fast without sacrificing coverage.",
+      "Eliminated brand-specific spec duplication entirely — one suite serves three bank clients across five environments through parameterization alone.",
     ],
     lessons: [
-      "Investing in fixtures early pays off more than adding more tests early.",
-      "Trace viewer and HTML reports turn CI failures into a five-minute diagnosis instead of a guessing game.",
-      "Sharding by feature domain, not by file count, keeps parallel runs balanced.",
+      "A test can pass visually while the backend fails silently — asserting only on the DOM isn't enough for anything that touches money or bookings; you need a backend oracle running alongside the UI oracle.",
+      "Parameterizing a suite across tenants is the right call when the apps are truly the same product, but it demands real discipline: without splitting helpers as they grow, the shared modules that absorb all the tenant branching become unmaintainable monoliths.",
+      "A sleep wrapper that's a hard no-op in CI is a small change that closes an entire failure class: it makes it structurally impossible for a 'temporary' timeout-based wait to survive into the pipeline.",
+      "Fail-closed defaults (no environment configured means nothing destructive runs) beat fail-open every time money or production data is in scope.",
+    ],
+    codeHighlights: [
+      {
+        title: "Sleeps that disappear in CI",
+        description:
+          "Raw waitForTimeout was banned outright. The only sanctioned sleep is a wrapper that's a no-op in CI, so it can never become a hidden primary wait — only a convenience for watching a run headed.",
+        code: `export async function headedWait(page, ms) {
+  if (!process.env.CI) await page.waitForTimeout(ms);
+}
+
+// Usage: event first, sleep cosmetic
+await waitForNetworkIdle(page);   // primary wait — works in CI and headed
+await headedWait(page, 2000);     // human-observation only — no-op in CI`,
+      },
+      {
+        title: "Click and network response, atomically",
+        description:
+          "The default pattern for anything that hits the backend: the click and the response it triggers are awaited together, so the test can't finish before the server has actually responded — and fails with the real status code when it doesn't.",
+        code: `const [response] = await Promise.all([
+  page.waitForResponse((r) => r.url().includes("/checkout/validate")),
+  continueButton.click(),
+]);
+if (!response.ok()) {
+  throw new Error(\`Validation failed: \${response.status()}\`);
+}`,
+      },
+      {
+        title: "Helpers return data, specs assert",
+        description:
+          "Assertions never live inside a helper. That keeps failures pointing at the business criteria in the spec, and lets the same helper serve both a positive and a negative test case.",
+        code: `// helper: acts, returns data — no expect()
+export async function searchAndCollect(page, destination) {
+  await searchBox.fill(destination);
+  await searchButton.click();
+  await resultsList.first().waitFor({ state: "visible" });
+  return { count: await resultsList.count() };
+}
+
+// spec: owns the assertion, and the meaning of "pass"
+const { count } = await searchAndCollect(page, "Cusco");
+expect(count).toBeGreaterThan(0);`,
+      },
     ],
   },
   {
@@ -40,7 +94,6 @@ export const projects: Project[] = [
     title: "API Testing Framework",
     tagline: "A structured, reusable Postman/Newman suite with schema validation and environment-driven config.",
     technologies: ["Postman", "Newman", "JSON Schema", "Environment Variables"],
-    github: "https://github.com/achanto98/api-testing-framework",
     problem:
       "API contracts were only validated manually, which meant breaking changes reached QA late in the cycle. The goal was a suite that could run in CI, validate both status codes and response shape, and be reused across environments without duplicating collections.",
     architecture:
@@ -63,7 +116,6 @@ export const projects: Project[] = [
     title: "Performance Testing with JMeter",
     tagline: "Load and stress testing pipeline with data-driven scenarios and automated HTML dashboards.",
     technologies: ["JMeter", "Thread Groups", "CSV Data Set Config", "JSON Extractor"],
-    github: "https://github.com/achanto98/performance-testing-jmeter",
     problem:
       "The team had no visibility into how key endpoints behaved under realistic concurrent load, which meant performance regressions were only discovered in production. The objective was a repeatable load test that modeled real usage and produced a report stakeholders could actually read.",
     architecture:
@@ -86,7 +138,6 @@ export const projects: Project[] = [
     title: "CI/CD Pipeline with GitHub Actions",
     tagline: "Automated test execution, reporting, and validation wired directly into the delivery pipeline.",
     technologies: ["GitHub Actions", "YAML Workflows", "Artifacts", "Status Checks"],
-    github: "https://github.com/achanto98/cicd-github-actions",
     problem:
       "Automated tests existed but were run manually and inconsistently before merges, so they didn't actually prevent regressions from reaching main. The pipeline needed to run tests automatically, surface results clearly, and gate merges on quality.",
     architecture:
@@ -109,7 +160,6 @@ export const projects: Project[] = [
     title: "Quality Engineering Case Study: Hotel Booking Platform",
     tagline: "End-to-end test strategy for a hotel booking system, from risk analysis to release checklist.",
     technologies: ["Risk-Based Testing", "Test Strategy", "Release Validation"],
-    github: "https://github.com/achanto98/qe-case-study-hotel-booking",
     problem:
       "This case study answers a common senior QA interview question: how would you approach quality for a system like a hotel booking platform (search, availability, pricing, booking, payment, cancellation) with no prior context on the codebase, and a release next sprint?",
     architecture:

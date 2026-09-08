@@ -17,12 +17,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Armando Chanto — QA Lead & Software Quality Engineer",
+  title: "Armando Chanto — QA Engineer & Software Engineer",
   description:
-    "Portfolio of Armando Chanto, QA Lead specializing in test automation, API testing, and performance testing.",
+    "Portfolio of Armando Chanto, QA Engineer with leadership experience specializing in test automation, API testing, and performance testing.",
   metadataBase: new URL("https://armandochanto.dev"),
   openGraph: {
-    title: "Armando Chanto — QA Lead & Software Quality Engineer",
+    title: "Armando Chanto — QA Engineer & Software Engineer",
     description:
       "Automation, API testing, and performance testing — with the engineering thinking behind each project.",
     url: "https://armandochanto.dev",

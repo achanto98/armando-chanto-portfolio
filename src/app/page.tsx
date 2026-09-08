@@ -23,7 +23,7 @@ export default function HomePage() {
             Armando Chanto
           </h1>
           <p className="mt-3 max-w-2xl text-xl text-slate-300 sm:text-2xl">
-            QA Lead &amp; Software Quality Engineer
+            QA Lead &amp; Software Engineer
           </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-400">
             I build test strategies and automation frameworks that catch problems before
