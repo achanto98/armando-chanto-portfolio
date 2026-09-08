@@ -1,3 +1,5 @@
+import type { Language } from "@/lib/language-context";
+
 export type Project = {
   slug: string;
   title: string;
@@ -13,7 +15,7 @@ export type Project = {
   codeHighlights?: { title: string; description: string; code: string }[];
 };
 
-export const projects: Project[] = [
+const projectsEn: Project[] = [
   {
     slug: "playwright-automation-framework",
     title: "Multi-Tenant E2E Automation Framework for a Banking Travel Platform",
@@ -179,6 +181,180 @@ expect(count).toBeGreaterThan(0);`,
   },
 ];
 
-export function getProjectBySlug(slug: string): Project | undefined {
-  return projects.find((p) => p.slug === slug);
+const projectsEs: Project[] = [
+  {
+    slug: "playwright-automation-framework",
+    title: "Framework de Automatización E2E Multi-Tenant para una Plataforma Bancaria de Viajes",
+    tagline:
+      "Una sola suite de Playwright parametrizada que valida la misma app de reservas de viajes en tres bancos distintos — con oráculos de backend y de errores que la UI sola no puede dar.",
+    technologies: [
+      "Playwright",
+      "JavaScript",
+      "Custom Fixtures",
+      "Custom Reporter API",
+      "GitHub Actions",
+    ],
+    repoNote:
+      "Construido como parte de un proyecto de QA en producción para un cliente bancario. El código es privado y propiedad del cliente, así que no puede enlazarse aquí — el resumen y los fragmentos de abajo describen la arquitectura y los patrones reales, escritos de memoria sin ningún código o dato que identifique al cliente.",
+    problem:
+      "La aplicación bajo prueba era un producto de reservas de viajes (vuelos, hoteles, autos, cuenta) de marca blanca para tres bancos distintos, cada uno con su propio dominio, flujo de autenticación y matriz de entornos (QA, staging, demo, pre-prod, producción). El enfoque ingenuo — una carpeta de pruebas por banco — habría triplicado el costo de mantenimiento de cada cambio de UI, ya que las tres marcas comparten la misma aplicación base y solo la autenticación y la resolución de URL realmente difieren.",
+    architecture:
+      "La suite corre como un solo código parametrizado en tiempo de ejecución por PLATFORM (qué banco) y TEST_ENV (qué entorno), resuelto de forma centralizada en un único módulo de URL/configuración para que los specs nunca bifurquen por tenant. La autenticación corre una sola vez por suite mediante una dependencia de proyecto de Playwright: un proyecto de setup inicia sesión, espera a que el token de auth realmente llegue al storage (no solo a que cambie la URL), y persiste cookies + localStorage en un archivo de storage-state que heredan todos los demás proyectos — convirtiendo 50+ tests de login en un solo paso rápido y diagnosticable, en vez de 50 oportunidades de fallar. Los tests se etiquetan por suite, módulo y aspecto (por ejemplo smoke + vuelos, regression + pagos) para que CI pueda seleccionar exactamente el segmento correcto: smoke completo en cada PR, un grep excluyendo pagos antes de tocar staging, reruns por módulo cuando cambia una sola área.",
+    implementation:
+      "Dos disciplinas sostienen el framework. Primero, las esperas son basadas en eventos de principio a fin: un pequeño wrapper convierte los sleeps crudos en un no-op en CI y los deja legítimos solo para un humano viendo el modo headed, y el patrón por defecto para cualquier acción que golpea el backend es un clic y la respuesta de red correspondiente esperados juntos (Promise.all), para que el test nunca tenga que adivinar si un paso de checkout realmente falló en el servidor. Segundo, los helpers están estrictamente separados de las aserciones — las funciones helper ejecutan acciones y lógica de UI y devuelven datos planos, mientras que el archivo de spec es dueño de cada expect() y por lo tanto de cada mensaje de fallo legible para el negocio; el mismo helper de búsqueda sirve tanto a un test de 'resultados encontrados' como a un caso límite de 'cero resultados', en vez de solo el happy path. Encima de eso hay una capa de oráculos más allá de la UI: un fixture de network-guard clasifica cada XHR/fetch contra un mapa de endpoints críticos y hace fallar el test de forma dura si un endpoint vigilado devuelve un error o nunca es llamado — incluso si todas las aserciones visibles pasaron — y adjunta un diagnóstico de causa raíz al reporte HTML; un error-guard basado en mutation-observer detecta diálogos de error transitorios que una aserción puntual simplemente pasaría por alto; y un env-guard falla cerrado, bloqueando por defecto que flujos destructivos o de pago corran fuera del entorno designado como seguro.",
+    results: [
+      "Redujo la inestabilidad relacionada a auth casi a cero al mover 50+ tests de login por-test a una sola sesión compartida y verificada.",
+      "Detectó regresiones de backend totalmente invisibles en la UI — el hard-gate del network-guard convirtió respuestas 5xx/4xx silenciosas en tests fallidos con un diagnóstico de causa raíz adjunto, en vez de un reporte falsamente verde.",
+      "Hizo la suite ejecutable selectivamente (smoke vs. regression, por módulo, excluyendo pagos) mediante una taxonomía de tags, manteniendo la retroalimentación de CI rápida sin sacrificar cobertura.",
+      "Eliminó por completo la duplicación de specs por marca — una sola suite sirve a tres bancos en cinco entornos solo mediante parametrización.",
+    ],
+    lessons: [
+      "Un test puede pasar visualmente mientras el backend falla en silencio — asertar solo sobre el DOM no basta para nada que toque dinero o reservas; se necesita un oráculo de backend corriendo junto al oráculo de UI.",
+      "Parametrizar una suite entre tenants es la decisión correcta cuando las apps son realmente el mismo producto, pero exige disciplina real: sin dividir los helpers a medida que crecen, los módulos compartidos que absorben toda la bifurcación por tenant se vuelven monolitos inmantenibles.",
+      "Un wrapper de sleep que es un no-op estricto en CI es un cambio pequeño que cierra toda una clase de fallos: hace estructuralmente imposible que una espera 'temporal' basada en timeout sobreviva hasta el pipeline.",
+      "Los valores por defecto que fallan cerrado (sin entorno configurado, nada destructivo corre) le ganan a fallar abierto siempre que hay dinero o datos de producción en juego.",
+    ],
+    codeHighlights: [
+      {
+        title: "Sleeps que desaparecen en CI",
+        description:
+          "El waitForTimeout crudo estaba prohibido por completo. El único sleep permitido es un wrapper que es un no-op en CI, así que nunca puede convertirse en una espera primaria oculta — solo en una conveniencia para ver una corrida en modo headed.",
+        code: `export async function headedWait(page, ms) {
+  if (!process.env.CI) await page.waitForTimeout(ms);
+}
+
+// Uso: evento primero, sleep cosmético
+await waitForNetworkIdle(page);   // espera primaria — funciona en CI y headed
+await headedWait(page, 2000);     // solo observación humana — no-op en CI`,
+      },
+      {
+        title: "Clic y respuesta de red, de forma atómica",
+        description:
+          "El patrón por defecto para cualquier acción que golpea el backend: el clic y la respuesta que dispara se esperan juntos, para que el test no pueda terminar antes de que el servidor realmente haya respondido — y falle con el código de estado real cuando no lo hace.",
+        code: `const [response] = await Promise.all([
+  page.waitForResponse((r) => r.url().includes("/checkout/validate")),
+  continueButton.click(),
+]);
+if (!response.ok()) {
+  throw new Error(\`Validation failed: \${response.status()}\`);
+}`,
+      },
+      {
+        title: "Los helpers devuelven datos, los specs asertan",
+        description:
+          "Las aserciones nunca viven dentro de un helper. Eso mantiene los fallos apuntando al criterio de negocio en el spec, y permite que el mismo helper sirva tanto a un caso positivo como a uno negativo.",
+        code: `// helper: actúa, devuelve datos — sin expect()
+export async function searchAndCollect(page, destination) {
+  await searchBox.fill(destination);
+  await searchButton.click();
+  await resultsList.first().waitFor({ state: "visible" });
+  return { count: await resultsList.count() };
+}
+
+// spec: dueño de la aserción, y del significado de "pasar"
+const { count } = await searchAndCollect(page, "Cusco");
+expect(count).toBeGreaterThan(0);`,
+      },
+    ],
+  },
+  {
+    slug: "api-testing-framework",
+    title: "Framework de Pruebas de API",
+    tagline: "Una suite Postman/Newman estructurada y reutilizable, con validación de schema y configuración por entorno.",
+    technologies: ["Postman", "Newman", "JSON Schema", "Environment Variables"],
+    problem:
+      "Los contratos de API solo se validaban manualmente, lo que significaba que los cambios que rompían compatibilidad llegaban tarde a QA en el ciclo. El objetivo era una suite que pudiera correr en CI, validar tanto códigos de estado como la forma de la respuesta, y reutilizarse entre entornos sin duplicar colecciones.",
+    architecture:
+      "Las colecciones se organizan por recurso/dominio, con un script de pre-request compartido que maneja la autenticación (obtención y refresco de tokens) para que cada request individual se enfoque en el comportamiento bajo prueba. Los archivos de entorno parametrizan URLs base, credenciales y feature flags entre dev, staging y entornos similares a producción.",
+    implementation:
+      "Cada request combina aserciones funcionales (status, headers, reglas de negocio) con un paso de validación de JSON Schema, así se detecta el drift de contrato incluso cuando una aserción de happy-path seguiría pasando. Newman corre las colecciones sin interfaz en CI y genera un reporte HTML; se parsea un resumen JSON para fallar el pipeline ante cualquier violación de schema.",
+    results: [
+      "Cambios que rompían contratos detectados antes del merge en vez de durante pasadas manuales de QA.",
+      "Un solo set de colecciones reutilizado en tres entornos usando solo variables de entorno.",
+      "Retroalimentación de CI sobre cambios de API disponible en minutos.",
+    ],
+    lessons: [
+      "La validación de schema detecta una clase de bug distinta a las aserciones de código de estado por sí solas.",
+      "Centralizar la autenticación en un script de pre-request elimina toda una categoría de fallos intermitentes relacionados a credenciales.",
+      "Mantener las colecciones orientadas a recursos (no a casos de prueba) las hizo más fáciles de extender.",
+    ],
+  },
+  {
+    slug: "performance-testing-jmeter",
+    title: "Pruebas de Rendimiento con JMeter",
+    tagline: "Pipeline de pruebas de carga y estrés con escenarios basados en datos y dashboards HTML automatizados.",
+    technologies: ["JMeter", "Thread Groups", "CSV Data Set Config", "JSON Extractor"],
+    problem:
+      "El equipo no tenía visibilidad de cómo se comportaban los endpoints clave bajo carga concurrente realista, lo que significaba que las regresiones de rendimiento solo se descubrían en producción. El objetivo era una prueba de carga repetible que modelara el uso real y produjera un reporte que los stakeholders realmente pudieran leer.",
+    architecture:
+      "Los Thread Groups modelan journeys de usuario distintos (navegar, buscar, checkout) con períodos de ramp-up que imitan el crecimiento real de tráfico en vez de un pico instantáneo. Un CSV Data Set Config alimenta usuarios de prueba únicos por thread para evitar que artefactos de caché y sesión distorsionen los resultados. Los tokens de autenticación se capturan una vez por sesión con un JSON Extractor y se reutilizan en los requests.",
+    implementation:
+      "Los escenarios están parametrizados para que el mismo plan de pruebas corra a distintos niveles de carga (baseline, objetivo, estrés) cambiando la cantidad de threads y el ramp-up. El dashboard HTML de JMeter se genera después de cada corrida y se archiva junto al archivo de resultados crudo, así las tendencias entre releases son comparables en vez de un dato aislado.",
+    results: [
+      "Se estableció una línea base de rendimiento para los endpoints principales antes de un lanzamiento con mucho tráfico esperado.",
+      "Se identificó un cuello de botella en el pool de conexiones de base de datos bajo 3 veces la carga concurrente esperada.",
+      "Los dashboards HTML hicieron los resultados de rendimiento legibles para stakeholders no técnicos.",
+    ],
+    lessons: [
+      "Un ramp-up realista importa más que la cantidad pico de threads para encontrar cuellos de botella reales.",
+      "Datos de prueba únicos por thread evitan falsos negativos causados por el caché.",
+      "Una línea base de rendimiento solo es útil si se vuelve a correr en cada release importante, no solo una vez.",
+    ],
+  },
+  {
+    slug: "cicd-github-actions",
+    title: "Pipeline CI/CD con GitHub Actions",
+    tagline: "Ejecución automática de pruebas, reportería y validación conectadas directamente al pipeline de entrega.",
+    technologies: ["GitHub Actions", "YAML Workflows", "Artifacts", "Status Checks"],
+    problem:
+      "Existían pruebas automatizadas, pero se corrían manualmente y de forma inconsistente antes de los merges, así que en realidad no prevenían que las regresiones llegaran a main. El pipeline necesitaba correr las pruebas automáticamente, mostrar resultados con claridad, y bloquear merges según la calidad.",
+    architecture:
+      "El workflow se dispara en pull requests y pushes a main, corriendo linting, pruebas unitarias, y las suites de Playwright/API como jobs separados en paralelo. Se configuraron status checks obligatorios en la rama main para que un job fallido bloquee el botón de merge directamente en la interfaz de GitHub.",
+    implementation:
+      "Cada job cachea dependencias para mantener las corridas rápidas, sube reportes de pruebas y traces como artifacts del workflow, y publica un comentario resumen en el pull request con conteos de pass/fail. Un workflow programado aparte vuelve a correr la suite completa de regression cada noche contra staging para detectar drift de entorno.",
+    results: [
+      "Las regresiones ahora se detectan antes del merge, no después del deploy.",
+      "Los autores de PRs reciben retroalimentación y artifacts descargables de fallos sin salir de GitHub.",
+      "Las corridas nocturnas exponen problemas exclusivos de staging en un día en vez de al momento del release.",
+    ],
+    lessons: [
+      "Los status checks obligatorios son lo que realmente cambia el comportamiento del equipo, no solo que existan pruebas.",
+      "Subir traces/reportes como artifacts convierte una X roja en un siguiente paso accionable.",
+      "Dividir jobs en paralelo es una ganancia de velocidad mayor que optimizar cualquier test individual.",
+    ],
+  },
+  {
+    slug: "quality-engineering-case-study",
+    title: "Caso de Estudio de Quality Engineering: Plataforma de Reserva de Hoteles",
+    tagline: "Estrategia de pruebas de principio a fin para un sistema de reserva de hoteles, desde el análisis de riesgo hasta el checklist de release.",
+    technologies: ["Risk-Based Testing", "Test Strategy", "Release Validation"],
+    problem:
+      "Este caso de estudio responde una pregunta común en entrevistas de QA senior: ¿cómo abordarías la calidad de un sistema como una plataforma de reserva de hoteles (búsqueda, disponibilidad, precios, reserva, pago, cancelación) sin contexto previo del código, y con un release la próxima sprint?",
+    architecture:
+      "El enfoque parte de un análisis de riesgo a lo largo del flujo de reserva: los pagos y el doble-booking de inventario se clasifican como el riesgo más alto (impacto financiero y de confianza), la búsqueda/filtrado como riesgo medio (impacto de usabilidad), y el contenido estático como bajo. La estrategia de pruebas y la inversión en automatización se asignan proporcionalmente a esa clasificación de riesgo en vez de de forma pareja entre features.",
+    implementation:
+      "Los casos de prueba cubren explícitamente los casos límite del flujo de reserva: reservas concurrentes para la última habitación, cambios de precio a mitad de sesión, manejo de zonas horarias para check-in/check-out, y caminos de fallo/reintento de pago. La automatización apunta a los caminos de mayor riesgo y mayor repetición (búsqueda, reserva, pago) de principio a fin, mientras que las páginas de contenido de menor riesgo se cubren con smoke checks más ligeros. Un checklist de release lo amarra todo: suite de smoke en verde, sin defectos abiertos de alta severidad, línea base de rendimiento dentro del umbral, y un plan de rollback documentado.",
+    results: [
+      "Un plan de pruebas priorizado por riesgo que un equipo podría ejecutar en una sola sprint.",
+      "Alcance de automatización definido por impacto, no por lo más fácil de automatizar.",
+      "Una plantilla de checklist de release reutilizable más allá de este sistema en particular.",
+    ],
+    lessons: [
+      "La priorización basada en riesgo es lo que separa una estrategia de pruebas senior de un checklist feature por feature.",
+      "La concurrencia y los casos límite de pago son donde los sistemas de reserva realmente se rompen en producción.",
+      "Un checklist de release solo es valioso si incluye un plan de rollback, no solo un gate de go/no-go.",
+    ],
+  },
+];
+
+export function getProjects(language: Language): Project[] {
+  return language === "es" ? projectsEs : projectsEn;
+}
+
+export function getProjectBySlug(slug: string, language: Language): Project | undefined {
+  return getProjects(language).find((p) => p.slug === slug);
+}
+
+export function getAllSlugs(): string[] {
+  return projectsEn.map((p) => p.slug);
 }

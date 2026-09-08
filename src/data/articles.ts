@@ -1,3 +1,5 @@
+import type { Language } from "@/lib/language-context";
+
 export type Article = {
   slug: string;
   title: string;
@@ -6,7 +8,7 @@ export type Article = {
   month: string;
 };
 
-export const articles: Article[] = [
+const articlesEn: Article[] = [
   {
     slug: "building-scalable-playwright-frameworks",
     title: "Building Scalable Playwright Frameworks",
@@ -60,3 +62,62 @@ export const articles: Article[] = [
     month: "Coming soon",
   },
 ];
+
+const articlesEs: Article[] = [
+  {
+    slug: "building-scalable-playwright-frameworks",
+    title: "Cómo Construir Frameworks de Playwright Escalables",
+    summary:
+      "Cómo estructurar page objects, fixtures y sharding de CI para que una suite de automatización siga el ritmo del producto a medida que crece.",
+    status: "planned",
+    month: "Próximamente",
+  },
+  {
+    slug: "api-testing-best-practices",
+    title: "Buenas Prácticas de Pruebas de API",
+    summary:
+      "Validación de contratos con JSON Schema, colecciones dirigidas por entorno, y dónde las aserciones de Postman se quedan cortas.",
+    status: "planned",
+    month: "Próximamente",
+  },
+  {
+    slug: "performance-testing-with-jmeter",
+    title: "Pruebas de Rendimiento con JMeter",
+    summary:
+      "Diseño de Thread Groups realistas, cómo evitar artefactos de caché con datos de prueba variables, y cómo leer los dashboards correctamente.",
+    status: "planned",
+    month: "Próximamente",
+  },
+  {
+    slug: "smoke-vs-regression-testing",
+    title: "Smoke Testing vs. Pruebas de Regresión",
+    summary: "Cuándo cada una se gana su lugar en un pipeline, y por qué correr ambas en cada commit suele ser un error.",
+    status: "planned",
+    month: "Próximamente",
+  },
+  {
+    slug: "risk-based-testing",
+    title: "Pruebas Basadas en Riesgo",
+    summary: "Un framework práctico para asignar tiempo de pruebas limitado hacia los modos de fallo de mayor impacto.",
+    status: "planned",
+    month: "Próximamente",
+  },
+  {
+    slug: "release-validation-checklist",
+    title: "Checklist de Validación de Release",
+    summary: "Qué debería incluir realmente un checklist de go/no-go, incluyendo el plan de rollback que la mayoría de equipos se salta.",
+    status: "planned",
+    month: "Próximamente",
+  },
+  {
+    slug: "quality-engineering-mindset",
+    title: "La Mentalidad de Quality Engineering",
+    summary: "Por qué quality engineering es una disciplina de diseño, no una función de control al final de una sprint.",
+    status: "planned",
+    month: "Próximamente",
+  },
+];
+
+export function getArticles(language: Language): Article[] {
+  return language === "es" ? articlesEs : articlesEn;
+}

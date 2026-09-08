@@ -4,19 +4,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Container from "./Container";
-
-const links = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/projects", label: "Projects" },
-  { href: "/articles", label: "Articles" },
-  { href: "/resume", label: "Resume" },
-  { href: "/contact", label: "Contact" },
-];
+import { useLanguage } from "@/lib/language-context";
+import { uiStrings } from "@/data/ui-strings";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { language, toggleLanguage } = useLanguage();
+  const t = uiStrings[language].nav;
+
+  const links = [
+    { href: "/", label: t.home },
+    { href: "/about", label: t.about },
+    { href: "/projects", label: t.projects },
+    { href: "/articles", label: t.articles },
+    { href: "/resume", label: t.resume },
+    { href: "/contact", label: t.contact },
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink-700/60 bg-ink-950/80 backdrop-blur">
@@ -25,37 +29,50 @@ export default function Navbar() {
           armando<span className="text-accent">.chanto</span>
         </Link>
 
-        <nav className="hidden gap-8 md:flex">
-          {links.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  active ? "text-accent" : "text-slate-300 hover:text-white"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex items-center gap-6">
+          <nav className="hidden gap-8 md:flex">
+            {links.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors ${
+                    active ? "text-accent" : "text-slate-300 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
 
-        <button
-          type="button"
-          aria-label="Toggle navigation menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-600 text-slate-300 md:hidden"
-        >
-          <span className="sr-only">Menu</span>
-          <div className="space-y-1">
-            <span className="block h-0.5 w-5 bg-current" />
-            <span className="block h-0.5 w-5 bg-current" />
-            <span className="block h-0.5 w-5 bg-current" />
-          </div>
-        </button>
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            aria-label="Switch language / Cambiar idioma"
+            className="flex items-center gap-1 rounded-md border border-ink-600 px-2 py-1 font-mono text-xs font-semibold text-slate-300 transition-colors hover:border-accent hover:text-accent"
+          >
+            <span className={language === "en" ? "text-accent" : ""}>EN</span>
+            <span className="text-ink-600">/</span>
+            <span className={language === "es" ? "text-accent" : ""}>ES</span>
+          </button>
+
+          <button
+            type="button"
+            aria-label={t.toggleMenu}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-ink-600 text-slate-300 md:hidden"
+          >
+            <span className="sr-only">{t.toggleMenu}</span>
+            <div className="space-y-1">
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+            </div>
+          </button>
+        </div>
       </Container>
 
       {open && (

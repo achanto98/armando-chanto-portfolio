@@ -1,34 +1,36 @@
+"use client";
+
 import Link from "next/link";
 import Container from "@/components/Container";
 import ProjectCard from "@/components/ProjectCard";
-import { projects } from "@/data/projects";
-
-const highlights = [
-  { label: "Years in Software QA", value: "3+" },
-  { label: "Automation frameworks shipped", value: "4" },
-  { label: "Testing focus", value: "E2E · API · Performance" },
-];
+import { getProjects } from "@/data/projects";
+import { useLanguage } from "@/lib/language-context";
+import { uiStrings } from "@/data/ui-strings";
 
 export default function HomePage() {
-  const featured = projects.slice(0, 3);
+  const { language } = useLanguage();
+  const t = uiStrings[language].home;
+  const featured = getProjects(language).slice(0, 3);
+
+  const highlights = [
+    { label: t.highlights.years, value: "3+" },
+    { label: t.highlights.frameworks, value: "4" },
+    { label: t.highlights.focus, value: t.highlights.focusValue },
+  ];
 
   return (
     <>
       <section className="border-b border-ink-700/60 py-24 sm:py-32">
         <Container>
           <p className="font-mono text-sm uppercase tracking-widest text-accent">
-            Automation • API Testing • Performance Testing
+            {t.eyebrow}
           </p>
           <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-tight text-white sm:text-6xl">
             Armando Chanto
           </h1>
-          <p className="mt-3 max-w-2xl text-xl text-slate-300 sm:text-2xl">
-            QA Lead &amp; Software Engineer
-          </p>
+          <p className="mt-3 max-w-2xl text-xl text-slate-300 sm:text-2xl">{t.tagline}</p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-400">
-            I build test strategies and automation frameworks that catch problems before
-            they reach production — and I document the engineering decisions behind them,
-            not just the tools.
+            {t.description}
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
@@ -36,13 +38,13 @@ export default function HomePage() {
               href="/resume"
               className="rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-ink-950 transition-transform hover:scale-[1.02]"
             >
-              Resume
+              {t.resumeCta}
             </Link>
             <Link
               href="/projects"
               className="rounded-lg border border-ink-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-accent hover:text-accent"
             >
-              Projects
+              {t.projectsCta}
             </Link>
             <a
               href="https://github.com/achanto98"
@@ -50,7 +52,7 @@ export default function HomePage() {
               rel="noreferrer"
               className="rounded-lg border border-ink-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-accent hover:text-accent"
             >
-              GitHub
+              {t.githubCta}
             </a>
             <a
               href="https://www.linkedin.com/in/armando-chanto-cr2904/"
@@ -58,13 +60,13 @@ export default function HomePage() {
               rel="noreferrer"
               className="rounded-lg border border-ink-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-accent hover:text-accent"
             >
-              LinkedIn
+              {t.linkedinCta}
             </a>
             <Link
               href="/contact"
               className="rounded-lg border border-ink-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-accent hover:text-accent"
             >
-              Contact
+              {t.contactCta}
             </Link>
           </div>
 
@@ -83,11 +85,13 @@ export default function HomePage() {
         <Container>
           <div className="mb-10 flex items-end justify-between">
             <div>
-              <p className="font-mono text-sm uppercase tracking-widest text-accent">Selected work</p>
-              <h2 className="mt-2 text-3xl font-semibold text-white">Featured projects</h2>
+              <p className="font-mono text-sm uppercase tracking-widest text-accent">
+                {t.selectedWork}
+              </p>
+              <h2 className="mt-2 text-3xl font-semibold text-white">{t.featuredProjects}</h2>
             </div>
             <Link href="/projects" className="hidden text-sm font-medium text-accent sm:block">
-              View all projects →
+              {t.viewAllProjects}
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -96,7 +100,7 @@ export default function HomePage() {
             ))}
           </div>
           <Link href="/projects" className="mt-8 inline-block text-sm font-medium text-accent sm:hidden">
-            View all projects →
+            {t.viewAllProjects}
           </Link>
         </Container>
       </section>

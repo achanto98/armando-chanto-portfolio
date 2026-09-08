@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { projects } from "@/data/projects";
+import { getAllSlugs } from "@/data/projects";
 
 const baseUrl = "https://armandochanto.dev";
 
@@ -11,8 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const projectRoutes = projects.map((project) => ({
-    url: `${baseUrl}/projects/${project.slug}`,
+  const projectRoutes = getAllSlugs().map((slug) => ({
+    url: `${baseUrl}/projects/${slug}`,
     lastModified: new Date(),
   }));
 

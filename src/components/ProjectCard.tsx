@@ -1,7 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { Project } from "@/data/projects";
+import { useLanguage } from "@/lib/language-context";
+import { uiStrings } from "@/data/ui-strings";
 
 export default function ProjectCard({ project }: { project: Project }) {
+  const { language } = useLanguage();
+  const t = uiStrings[language].projects;
+
   return (
     <Link
       href={`/projects/${project.slug}`}
@@ -22,7 +29,7 @@ export default function ProjectCard({ project }: { project: Project }) {
         ))}
       </div>
       <span className="mt-5 inline-flex items-center text-sm font-medium text-accent">
-        View case study →
+        {t.viewCaseStudy}
       </span>
     </Link>
   );
