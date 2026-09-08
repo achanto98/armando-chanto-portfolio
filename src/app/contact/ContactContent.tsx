@@ -12,8 +12,8 @@ export default function ContactContent() {
   const channels = [
     {
       label: t.emailLabel,
-      value: "armax2904@gmail.com",
-      href: "mailto:armax2904@gmail.com",
+      value: "achanto98@gmail.com",
+      href: "mailto:achanto98@gmail.com",
     },
     {
       label: t.linkedinLabel,

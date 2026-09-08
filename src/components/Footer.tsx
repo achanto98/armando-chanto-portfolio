@@ -21,7 +21,7 @@ export default function Footer() {
           <a href="https://www.linkedin.com/in/armando-chanto-cr2904/" className="hover:text-accent" target="_blank" rel="noreferrer">
             {t.linkedinLabel}
           </a>
-          <a href="mailto:armax2904@gmail.com" className="hover:text-accent">
+          <a href="mailto:achanto98@gmail.com" className="hover:text-accent">
             {t.emailLabel}
           </a>
         </div>
